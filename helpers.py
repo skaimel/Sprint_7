@@ -7,11 +7,13 @@ import json
 
 
 # метод генерирует строку, состоящую только из букв нижнего регистра, в качестве параметра передаём длину строки
+@allure.step("Генерация строки случайных букв")
 def generate_random_string(length):
     random_string = ''.join(random.choices(string.ascii_lowercase, k=length))
     return random_string
 
 
+@allure.step("Регистрация нового курьера и возврат логина и пароля")
 def register_new_courier_and_return_login_password():
 
     # создаём список, чтобы метод мог его вернуть
@@ -42,11 +44,24 @@ def register_new_courier_and_return_login_password():
     return login_pass
 
 
+@allure.step("Генерация данных для незарегистрированного курьера")
 def generate_unregistered_courier():
     courier_data = []
     while len(courier_data) != 3:
         courier_data.append(generate_random_string(8))
     return courier_data
+
+
+@allure.step("Отправка запроса на создание курьера")
+def send_create_courier_request(payload):
+    response = requests.post(EndPoints.CREATE_COURIER, data=payload)
+    return response
+
+
+@allure.step("Отправка запроса на вход курьера")
+def send_login_request(payload):
+    response = requests.post(EndPoints.LOGIN_COURIER, data=payload)
+    return response
 
 
 class Order:
@@ -59,4 +74,3 @@ class Order:
         json_data = json.dumps(data)
         response = requests.post(EndPoints.CREATE_ORDERS, headers=headers, data=json_data)
         return response
-

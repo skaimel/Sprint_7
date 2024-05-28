@@ -6,18 +6,13 @@ import helpers
 import allure
 
 
-def send_login_request(payload):
-    response = requests.post(EndPoints.LOGIN_COURIER, data=payload)
-    return response
-
-
 @allure.suite('Логин курьера в системе')
 class TestLoginCourier:
     @allure.title('Проверка успешной авторизации курьера в системе')
     @allure.description('Тест успешной авторизации курьера в системе')
     def test_login_courier_successful(self, registered_courier):
         payload = registered_courier
-        response = send_login_request(payload)
+        response = helpers.send_login_request(payload)
         assert response.status_code == StatusCodes.courier_login_successful["status_code"]
         assert "id" in response.text
 
@@ -27,7 +22,7 @@ class TestLoginCourier:
     def test_login_courier_missing_field(self, registered_courier, missing_param):
         payload = registered_courier.copy()
         payload[missing_param] = ''
-        response = send_login_request(payload)
+        response = helpers.send_login_request(payload)
         assert response.status_code == StatusCodes.courier_login_one_param_empty["status_code"]
         assert response.text == StatusCodes.courier_login_one_param_empty["response_text"]
 
@@ -37,7 +32,7 @@ class TestLoginCourier:
     def test_login_courier_with_invalid_data(self, registered_courier, invalid_param):
         payload = registered_courier.copy()
         payload[invalid_param] += '1'
-        response = send_login_request(payload)
+        response = helpers.send_login_request(payload)
         assert response.status_code == StatusCodes.courier_login_incorrect_creds["status_code"]
         assert response.text == StatusCodes.courier_login_incorrect_creds["response_text"]
 
@@ -49,6 +44,6 @@ class TestLoginCourier:
             'login': login,
             'password': password
         }
-        response = send_login_request(payload)
+        response = helpers.send_login_request(payload)
         assert response.status_code == StatusCodes.courier_login_incorrect_creds["status_code"]
         assert response.text == StatusCodes.courier_login_incorrect_creds["response_text"]
